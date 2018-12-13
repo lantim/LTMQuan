@@ -1,0 +1,161 @@
+﻿<!doctype html>
+<html>
+    <head>
+            <meta charset="UTF-8">	
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> </head>
+    <style>
+        #title{
+    text-align:center;
+    margin:0px auto;
+    padding-top:50px;
+    width:600px;
+    height:80px;
+    background-color:#679bef;
+    border:1px solid #164a9e;
+    border-radius :5px;
+    box-shadow: 5px 5px 20px #888888;
+    margin-bottom:50px;
+    font-size: 1.5em;
+    color:white;
+}
+      #left{
+          width:300px;
+          padding-left:20px;  
+      }
+      #content{
+          width:700px;
+      }
+        #signin{
+    width:350px;
+    height:450px;
+    background-color:#1860d3;
+    padding:20px;
+    border:1px solid #1860d3;
+    border-radius:5px;
+    margin:0px auto; 
+    text-align: center;
+}
+#signin p{
+    text-align:center;
+    font-weight:700px;
+    font-size:1.7em;
+    color:#fff;
+    margin-bottom:25px;
+}
+#signin input{
+    border-radius:6px;
+    background-color:#07337a;
+    color:#fff;
+    padding:16px;
+    margin:0px auto;
+    margin-bottom:25px;
+    width:300px;
+    border:1px solid #07337a;
+    font-size:1.2em;
+}
+#signin button{
+    border-radius:6px;
+    color:#07337a;
+    background-color:#c3d0e4;
+    padding:10px;
+    width:330px;
+    font-size:1.5em;
+    font-weight: 700px;
+    margin-bottom:20px;
+    
+}
+    </style>
+    <body>
+        <div id="main">
+                <div id="title">WEBSERVER BY C/C++</div>
+
+
+           <table>
+               <td id="left"></td>
+               <td id="content">
+                    <div id="signin">
+                            <p>Webserver</p>
+                            <input type="text" name="username" id="username" placeholder="Enter username" value="admin">
+                            <input type="password" name="password" id="password" placeholder="Enter password" value="admin">
+                             <p id = "error"></p>
+                            <button id="submit" onclick="get()">Login</button>
+                             <a href="/register"><button id="register" onclick="register()">Sign up</button><a>
+                        </div>
+               </td>
+           </table>
+       
+                   
+            
+        </div>
+    </body>
+    <script>
+            $('body').on('click', 'p', function(){
+             $.post("/user",
+                 {"username":$(this).html()},
+                 function(data,status){
+                      //  $("#main").html("");
+                         $("#content").html(data);
+                         var temp=data.split("&");
+                         $("#username-info").val(temp[1]);
+                         $("#password-info").val(temp[2]);
+                         $("#fullname-info").val(temp[3]);
+                         $("#id").val(temp[4]);
+                 });
+         })
+                 function singup(){
+     
+     
+     
+                                  }
+             function get(){	
+                 $.post("/signin",
+                 {"username":$("#username").val(), "password":$("#password").val()},
+                 function(data,status){
+                        var dulieu = data.split("&")
+                         if(dulieu[1]=="0"){//đăng nhập không thành cồn
+                         $("#error").html("Sai ten tai khoan hoac mat khau"); 
+                         $("#error").css({"color":"red","font-size":"15px"});
+                         }else if(dulieu[1]=="1"){//đăng nhập thành công với người dùng ko có quyền admin
+                         $.post("/user", {"username":$("#username").val()},function(data2,status1){
+                         $("#content").html("");
+                         $("#content").html(data2);
+                         var temp=data2.split("&");
+                         $("#username-info").val(temp[1]);
+                         $("#password-info").val(temp[2]);
+                         $("#fullname-info").val(temp[3]);
+                         $("#id").val(temp[4]);
+                         });
+                         }else{// admin đăng nhập
+                         $("#left").html("");
+                         $("#left").html(data);
+			 $("#left").css("border","1px solid gray");
+			// $("#left").attr("border","1px solid #1860d3")
+			 $("#title").html();
+			 $("#content").html("");
+
+                         }
+                 });
+                 };
+             function update(){
+                    if(!$("#username-info").val()||!$("#password-info").val()||!$("#fullname-info").val()||!$("#id").val()){
+                                          $("#notice").html("Thieu du lieu"); 
+                         $("#notice").css({"color":"red","font-size":"15px"});
+                                   }else{
+                    $.post("/update",
+                 {"username":$("#username-info").val(), "password":$("#password-info").val(),"fullname":$("#fullname-info").val(), "id":$("#id").val()},
+                 function(data,status){
+                 //var dulieu = data.split("&")
+                    if(data=="1")
+                       { 
+                        $("#notice").html("update successfull!!");
+                        $("#notice").css("color","white");
+                        }else{
+                          $("#notice").html("update failed because unknown user!!");
+                        $("#notice").css("color","red");
+                        }
+                 });
+     }
+                                 };
+     
+         </script>
+</html>
